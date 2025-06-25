@@ -1,23 +1,27 @@
+// Node.js + Express 服务器，负责静态资源和配置文件的读写
+
 const express = require('express');
 const fs = require('fs').promises;
 const path = require('path');
 const app = express();
 const port = 3000;
 
-// Middleware
+// 解析JSON请求体
 app.use(express.json());
+// 静态资源服务，支持前端页面和静态文件
 app.use(express.static('.'));
 
-// Serve static files
+// 首页路由，返回主页面
 app.get('/', (req, res) => {
     res.sendFile(path.join(__dirname, 'index.html'));
 });
 
+// 编辑页路由，返回编辑页面
 app.get('/edit', (req, res) => {
     res.sendFile(path.join(__dirname, 'edit.html'));
 });
 
-// Save configuration
+// 保存配置接口，接收POST请求，写入config.json
 app.post('/save-config', async (req, res) => {
     try {
         const config = req.body;
@@ -29,7 +33,7 @@ app.post('/save-config', async (req, res) => {
     }
 });
 
-// Get configuration
+// 获取配置接口，返回config.json内容
 app.get('/config', async (req, res) => {
     try {
         const configData = await fs.readFile('config.json', 'utf8');
@@ -39,6 +43,7 @@ app.get('/config', async (req, res) => {
     }
 });
 
+// 启动服务器
 app.listen(port, () => {
     console.log(`Server running at http://localhost:${port}`);
 }); 

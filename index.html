@@ -4,23 +4,29 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Dynamic Grid Dashboard</title>
+    <!-- 引入主样式 -->
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
+    <!-- 主容器，居中显示所有内容 -->
     <div class="container">
+        <!-- 标题区 -->
         <h1 style="text-align: center; margin-bottom: 20px;">Dynamic Grid Dashboard</h1>
+        <!-- 网格容器，格子由JS动态生成 -->
         <div id="grid-container" class="grid">
             <!-- Grid items will be dynamically generated -->
             <div style="text-align: center; padding: 20px; color: #666;">
                 Loading grid...
             </div>
         </div>
+        <!-- 操作提示区 -->
         <div style="text-align: center; margin-top: 20px; padding: 10px; background: #f8f9fa; border-radius: 8px;">
             <p>👆 点击任意格子查看全屏</p>
             <p>按 'H' 键或 'ESC' 键返回九宫格视图</p>
             <p>按 'E' 键进入编辑模式</p>
         </div>
     </div>
+    <!-- 主页面脚本，负责动态生成网格和交互 -->
     <script src="script.js"></script>
 </body>
 </html> 

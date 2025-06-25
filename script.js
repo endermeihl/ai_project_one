@@ -1,14 +1,16 @@
+// 主页面脚本，动态生成网格并支持全屏、编辑等功能
+
 document.addEventListener('DOMContentLoaded', () => {
     console.log('DOM loaded, initializing...');
     
-    let currentFullscreen = null;
+    let currentFullscreen = null; // 当前全屏的格子
     let currentConfig = {
-        rows: 3,
-        columns: 3,
-        urls: []
+        rows: 3, // 网格行数
+        columns: 3, // 网格列数
+        urls: [] // 每个格子的URL
     };
 
-    // Load configuration and initialize grid
+    // 加载配置并初始化网格
     async function loadConfig() {
         console.log('Loading configuration...');
         try {
@@ -16,11 +18,11 @@ document.addEventListener('DOMContentLoaded', () => {
             if (!response.ok) {
                 throw new Error(`HTTP error! status: ${response.status}`);
             }
-            currentConfig = await response.json();
+            currentConfig = await response.json(); // 读取配置
             console.log('Configuration loaded:', currentConfig);
         } catch (error) {
             console.log('No configuration found, using defaults:', error);
-            // Use default 3x3 grid with empty URLs
+            // 默认3x3空网格
             currentConfig = {
                 rows: 3,
                 columns: 3,
@@ -30,7 +32,7 @@ document.addEventListener('DOMContentLoaded', () => {
         generateGrid();
     }
 
-    // Generate grid based on configuration
+    // 根据配置生成网格
     function generateGrid() {
         console.log('Generating grid with config:', currentConfig);
         
@@ -39,7 +41,7 @@ document.addEventListener('DOMContentLoaded', () => {
             console.error('Grid container not found!');
             return;
         }
-        
+        // 设置网格的行列数
         gridContainer.style.gridTemplateColumns = `repeat(${currentConfig.columns}, 1fr)`;
         gridContainer.style.gridTemplateRows = `repeat(${currentConfig.rows}, 1fr)`;
         
@@ -53,11 +55,12 @@ document.addEventListener('DOMContentLoaded', () => {
             gridItem.className = 'grid-item';
             gridItem.setAttribute('data-index', i + 1);
             
-            // Add zoom-view class if URL is provided
+            // 有URL的格子加缩放类
             if (currentConfig.urls[i] && currentConfig.urls[i].trim() !== '') {
                 gridItem.classList.add('zoom-view');
             }
             
+            // 创建iframe嵌入页面
             const iframe = document.createElement('iframe');
             iframe.src = currentConfig.urls[i] || 'about:blank';
             iframe.frameborder = '0';
@@ -68,18 +71,19 @@ document.addEventListener('DOMContentLoaded', () => {
         
         console.log('Grid generated successfully');
         
-        // Re-attach event listeners
+        // 绑定事件
         attachEventListeners();
         updateScaledIFrames();
     }
 
+    // 缩放有zoom-view类的iframe
     function updateScaledIFrames() {
         const scaledItems = document.querySelectorAll('.zoom-view');
         scaledItems.forEach(item => {
             const iframe = item.querySelector('iframe');
             if (!iframe || item.classList.contains('fullscreen')) return;
 
-            const contentWidth = 1920;
+            const contentWidth = 1920; // 假定内容宽度
             const containerWidth = item.clientWidth;
 
             if (containerWidth > 0) {
@@ -89,6 +93,7 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
+    // 绑定格子的点击事件，实现全屏
     function attachEventListeners() {
         const gridItems = document.querySelectorAll('.grid-item');
         console.log(`Attaching event listeners to ${gridItems.length} grid items`);
@@ -96,7 +101,7 @@ document.addEventListener('DOMContentLoaded', () => {
         gridItems.forEach(item => {
             item.addEventListener('click', () => {
                 if (!currentFullscreen) {
-                    item.classList.add('fullscreen');
+                    item.classList.add('fullscreen'); // 进入全屏
                     currentFullscreen = item;
                     document.body.style.overflow = 'hidden';
                 }
@@ -104,7 +109,7 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // Handle keyboard events
+    // 处理键盘事件：H/ESC退出全屏，E进入编辑
     document.addEventListener('keydown', (e) => {
         if ((e.key.toLowerCase() === 'h' || e.key === 'Escape') && currentFullscreen) {
             currentFullscreen.classList.remove('fullscreen');
@@ -116,17 +121,16 @@ document.addEventListener('DOMContentLoaded', () => {
             currentFullscreen = null;
             document.body.style.overflow = '';
         }
-        
-        // Handle edit mode
+        // E键进入编辑页面
         if (e.key.toLowerCase() === 'e') {
             window.location.href = '/edit';
         }
     });
 
-    // Handle window resize
+    // 窗口大小变化时重新缩放
     window.addEventListener('resize', updateScaledIFrames);
 
-    // Initialize
+    // 初始化
     console.log('Starting initialization...');
     loadConfig();
 }); 
