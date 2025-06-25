@@ -72,15 +72,18 @@ body {
 
 /* 全屏模式样式 */
 .fullscreen {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100vw;
-    height: 100vh;
-    z-index: 1000;
-    background-color: #fff;
+    position: fixed !important;
+    top: 0 !important;
+    left: 0 !important;
+    width: 100vw !important;
+    height: 100vh !important;
+    z-index: 9999 !important;
+    background-color: #fff !important;
     transform: none !important;
-    cursor: default;
+    cursor: default !important;
+    border-radius: 0 !important;
+    box-shadow: none !important;
+    overflow: hidden !important;
 }
 
 /* 全屏时禁止再次缩放 */
@@ -90,17 +93,20 @@ body {
 
 /* 全屏下iframe铺满 */
 .fullscreen iframe {
-    width: 100%;
-    height: 100%;
+    width: 100% !important;
+    height: 100% !important;
+    border: none !important;
 }
 
 /* 全屏下强制iframe正常显示和可交互 */
-.grid-item.fullscreen iframe {
+.fullscreen.zoom-view iframe {
     position: relative !important;
     width: 100% !important;
     height: 100% !important;
     transform: none !important;
     pointer-events: auto !important;
+    top: 0 !important;
+    left: 0 !important;
 }
 
 /* 响应式设计：移动端适配 */
@@ -127,6 +133,7 @@ body {
     font-size: 14px;
     opacity: 0;
     animation: fadeInOut 3s ease-in-out;
+    z-index: 10000;
 }
 
 /* 提示动画效果 */

@@ -100,10 +100,23 @@ document.addEventListener('DOMContentLoaded', () => {
         
         gridItems.forEach(item => {
             item.addEventListener('click', () => {
+                console.log('Grid item clicked:', item);
                 if (!currentFullscreen) {
+                    console.log('Entering fullscreen mode');
                     item.classList.add('fullscreen'); // 进入全屏
                     currentFullscreen = item;
                     document.body.style.overflow = 'hidden';
+                    
+                    // 调试信息
+                    console.log('Fullscreen element:', item);
+                    console.log('Fullscreen element classes:', item.className);
+                    console.log('Fullscreen element style:', item.style.cssText);
+                    
+                    // 强制重新计算样式
+                    setTimeout(() => {
+                        console.log('Fullscreen element after timeout:', item);
+                        console.log('Fullscreen element computed style:', window.getComputedStyle(item));
+                    }, 100);
                 }
             });
         });
