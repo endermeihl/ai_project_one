@@ -1,0 +1,16 @@
+{
+  "name": "grid-dashboard",
+  "version": "1.0.0",
+  "description": "Dynamic Grid Dashboard with editing capabilities",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node server.js"
+  },
+  "dependencies": {
+    "express": "^4.18.2"
+  },
+  "keywords": ["dashboard", "grid", "iframe"],
+  "author": "",
+  "license": "MIT"
+} 

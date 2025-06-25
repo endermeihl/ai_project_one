@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Grid Editor</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f0f0f0;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        h1 {
+            text-align: center;
+            margin-bottom: 30px;
+            color: #333;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+            color: #555;
+        }
+
+        input[type="number"] {
+            width: 100px;
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 16px;
+        }
+
+        .grid-size {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .url-inputs {
+            margin-top: 20px;
+        }
+
+        .url-grid {
+            display: grid;
+            gap: 10px;
+            margin-top: 10px;
+        }
+
+        .url-input {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .url-input input {
+            flex: 1;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+
+        .url-input label {
+            min-width: 60px;
+            margin-bottom: 0;
+        }
+
+        .buttons {
+            text-align: center;
+            margin-top: 30px;
+        }
+
+        button {
+            padding: 12px 30px;
+            margin: 0 10px;
+            border: none;
+            border-radius: 5px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        .save-btn {
+            background-color: #4CAF50;
+            color: white;
+        }
+
+        .save-btn:hover {
+            background-color: #45a049;
+        }
+
+        .cancel-btn {
+            background-color: #f44336;
+            color: white;
+        }
+
+        .cancel-btn:hover {
+            background-color: #da190b;
+        }
+
+        .preview {
+            margin-top: 20px;
+            padding: 15px;
+            background-color: #f9f9f9;
+            border-radius: 5px;
+        }
+
+        .preview h3 {
+            margin-bottom: 10px;
+            color: #666;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Grid Configuration Editor</h1>
+        
+        <div class="form-group">
+            <label>Grid Size:</label>
+            <div class="grid-size">
+                <input type="number" id="rows" min="1" max="10" value="3">
+                <span>×</span>
+                <input type="number" id="columns" min="1" max="10" value="3">
+            </div>
+        </div>
+
+        <div class="preview">
+            <h3>Preview:</h3>
+            <div id="preview-grid"></div>
+        </div>
+
+        <div class="url-inputs">
+            <label>URL Configuration:</label>
+            <div id="url-grid" class="url-grid"></div>
+        </div>
+
+        <div class="buttons">
+            <button class="save-btn" onclick="saveConfig()">Save Configuration</button>
+            <button class="cancel-btn" onclick="cancelEdit()">Cancel</button>
+        </div>
+    </div>
+
+    <script>
+        let currentConfig = {
+            rows: 3,
+            columns: 3,
+            urls: []
+        };
+
+        // Load current configuration
+        async function loadConfig() {
+            try {
+                const response = await fetch('config.json');
+                currentConfig = await response.json();
+                document.getElementById('rows').value = currentConfig.rows;
+                document.getElementById('columns').value = currentConfig.columns;
+                updateUrlInputs();
+                updatePreview();
+            } catch (error) {
+                console.log('No existing config found, using defaults');
+                updateUrlInputs();
+                updatePreview();
+            }
+        }
+
+        // Update URL input fields based on grid size
+        function updateUrlInputs() {
+            const rows = parseInt(document.getElementById('rows').value);
+            const columns = parseInt(document.getElementById('columns').value);
+            const totalCells = rows * columns;
+            
+            const urlGrid = document.getElementById('url-grid');
+            urlGrid.innerHTML = '';
+            
+            // Ensure urls array has enough elements
+            while (currentConfig.urls.length < totalCells) {
+                currentConfig.urls.push('');
+            }
+            
+            for (let i = 0; i < totalCells; i++) {
+                const urlInput = document.createElement('div');
+                urlInput.className = 'url-input';
+                urlInput.innerHTML = `
+                    <label>Cell ${i + 1}:</label>
+                    <input type="text" id="url-${i}" value="${currentConfig.urls[i] || ''}" placeholder="Enter URL here">
+                `;
+                urlGrid.appendChild(urlInput);
+            }
+        }
+
+        // Update preview grid
+        function updatePreview() {
+            const rows = parseInt(document.getElementById('rows').value);
+            const columns = parseInt(document.getElementById('columns').value);
+            const previewGrid = document.getElementById('preview-grid');
+            
+            previewGrid.style.display = 'grid';
+            previewGrid.style.gridTemplateColumns = `repeat(${columns}, 1fr)`;
+            previewGrid.style.gap = '5px';
+            previewGrid.style.maxWidth = '300px';
+            
+            previewGrid.innerHTML = '';
+            
+            for (let i = 0; i < rows * columns; i++) {
+                const cell = document.createElement('div');
+                cell.style.width = '40px';
+                cell.style.height = '40px';
+                cell.style.backgroundColor = '#ddd';
+                cell.style.border = '1px solid #999';
+                cell.style.display = 'flex';
+                cell.style.alignItems = 'center';
+                cell.style.justifyContent = 'center';
+                cell.style.fontSize = '12px';
+                cell.textContent = i + 1;
+                previewGrid.appendChild(cell);
+            }
+        }
+
+        // Save configuration
+        async function saveConfig() {
+            const rows = parseInt(document.getElementById('rows').value);
+            const columns = parseInt(document.getElementById('columns').value);
+            const urls = [];
+            
+            for (let i = 0; i < rows * columns; i++) {
+                const urlInput = document.getElementById(`url-${i}`);
+                urls.push(urlInput.value);
+            }
+            
+            const config = {
+                rows: rows,
+                columns: columns,
+                urls: urls
+            };
+            
+            try {
+                const response = await fetch('/save-config', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(config)
+                });
+                
+                if (response.ok) {
+                    alert('Configuration saved successfully!');
+                    window.location.href = 'index.html';
+                } else {
+                    alert('Failed to save configuration');
+                }
+            } catch (error) {
+                console.error('Error saving config:', error);
+                alert('Error saving configuration');
+            }
+        }
+
+        // Cancel editing
+        function cancelEdit() {
+            if (confirm('Are you sure you want to cancel? All changes will be lost.')) {
+                window.location.href = 'index.html';
+            }
+        }
+
+        // Event listeners
+        document.getElementById('rows').addEventListener('input', () => {
+            updateUrlInputs();
+            updatePreview();
+        });
+        
+        document.getElementById('columns').addEventListener('input', () => {
+            updateUrlInputs();
+            updatePreview();
+        });
+
+        // Load configuration on page load
+        loadConfig();
+    </script>
+</body>
+</html> 
